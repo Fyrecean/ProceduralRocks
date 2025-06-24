@@ -1,0 +1,23 @@
+[gd_scene load_steps=5 format=3 uid="uid://d1clyp84q0qpc"]
+
+[ext_resource type="Script" uid="uid://wjilyxlca6g6" path="res://procedural_rock.gd" id="1_8h7bp"]
+[ext_resource type="Script" uid="uid://cdjj0scpt3nrv" path="res://GenRock.gd" id="1_h1d8h"]
+[ext_resource type="Script" uid="uid://1r7iust1153t" path="res://mesh_debugger.gd" id="2_gc1d4"]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_h1d8h"]
+
+[node name="ProceduralRock" type="Node3D"]
+script = ExtResource("1_8h7bp")
+
+[node name="Rock" type="MeshInstance3D" parent="."]
+mesh = SubResource("ArrayMesh_h1d8h")
+script = ExtResource("1_h1d8h")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.30262)
+
+[node name="MeshDebugger" type="Node3D" parent="."]
+script = ExtResource("2_gc1d4")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.94587, -0.324545, 0, 0.324545, 0.94587, 0, 0, 0)
