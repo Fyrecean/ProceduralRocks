@@ -4,11 +4,11 @@ extends MeshInstance3D
 # Called when the node enters the scene tree for the first time.
 func generate() -> void:
 	var surface_array = gen_triangle()
-	surface_array = subdivide_triangles(surface_array)
+	surface_array = subdivide_triangles(surface_array, 3)
 	surface_array[Mesh.ARRAY_NORMAL] = gen_normals(surface_array)
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
 	mesh.surface_set_material(0, ResourceLoader.load("res://vertex_albedo_material.tres"))
-	ResourceSaver.save(mesh, "res://icosphere.tres", ResourceSaver.FLAG_COMPRESS)
+	ResourceSaver.save(mesh, "res://procedural_objects/icosphere.tres", ResourceSaver.FLAG_COMPRESS)
 
 func gen_triangle() -> Array:
 	var surface_array = []
@@ -57,31 +57,36 @@ func gen_normals(surface_array: Array) -> PackedVector3Array:
 		normals[i] = normal.normalized()
 		
 	return normals
-	
-func subdivide_triangles(surface_array: Array) -> Array:
-	var verts: PackedVector3Array = surface_array[Mesh.ARRAY_VERTEX]
-	var old_idx = surface_array[Mesh.ARRAY_INDEX]
-	
-	var v1 = old_idx[0]
-	var v2 = old_idx[1]
-	var v3 = old_idx[2]
-	
-	var m1 = len(verts)
-	verts.append(get_mid_point(verts[v1], verts[v2]))
-	var m2 = m1 + 1
-	verts.append(get_mid_point(verts[v2], verts[v3]))
-	var m3 = m1 + 2
-	verts.append(get_mid_point(verts[v1], verts[v3]))
-	
-	var new_idx = PackedInt32Array()
-	new_idx.append_array([v1, m1, m3])
-	new_idx.append_array([v2, m2, m1])
-	new_idx.append_array([v3, m3, m2])
-	new_idx.append_array([m1, m2, m3])
-	
-	surface_array[Mesh.ARRAY_INDEX] = new_idx
+
+func subdivide_triangles(surface_array: Array, iterations: int = 1) -> Array:
+	for _rounds in range(iterations):
+		var vert_cache: Dictionary[Vector2i, int] = {}
+		var new_idx = PackedInt32Array()
+		for i in range(0, surface_array[Mesh.ARRAY_INDEX].size(), 3):
+			var verts: PackedVector3Array = surface_array[Mesh.ARRAY_VERTEX]
+			
+			var v1 = surface_array[Mesh.ARRAY_INDEX][i]
+			var v2 = surface_array[Mesh.ARRAY_INDEX][i + 1]
+			var v3 = surface_array[Mesh.ARRAY_INDEX][i + 2]
+			
+			var m1 = _add_middle_vert(verts, vert_cache, v1, v2)
+			var m2 = _add_middle_vert(verts, vert_cache, v2, v3)
+			var m3 = _add_middle_vert(verts, vert_cache, v1, v3)
+			
+			new_idx.append_array([v1, m1, m3])
+			new_idx.append_array([v2, m2, m1])
+			new_idx.append_array([v3, m3, m2])
+			new_idx.append_array([m1, m2, m3])
+		surface_array[Mesh.ARRAY_INDEX] = new_idx
 	return surface_array
 	
-func get_mid_point(p1: Vector3, p2: Vector3) -> Vector3:
-	return p1 + ((p2 - p1) / 2)
-	
+func _add_middle_vert(verts, cache, idx1, idx2) -> int:
+	var new_idx
+	if cache.has(Vector2i(idx1, idx2)):
+		new_idx = cache[Vector2i(idx1, idx2)]
+	else:
+		new_idx = verts.size()
+		verts.append(verts[idx1] + ((verts[idx2] - verts[idx1]) / 2))
+		cache[Vector2i(idx1, idx2)] = new_idx
+		cache[Vector2i(idx2, idx1)] = new_idx
+	return new_idx

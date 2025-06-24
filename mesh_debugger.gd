@@ -16,12 +16,13 @@ func render(mesh: Mesh) -> void:
 	var surface_array = mesh.surface_get_arrays(0)
 	var verts = surface_array[Mesh.ARRAY_VERTEX]
 	var normals = surface_array[Mesh.ARRAY_NORMAL]
-	var index = surface_array[Mesh.ARRAY_INDEX]
 	for child in get_children():
 		child.queue_free()
 	for i in range(verts.size()):
 		var label = Label3D.new()
 		label.text = str(i)
+		label.font_size = 8
+		label.outline_size = 1
 		label.position = verts[i] + (.05 * normals[i])
 		label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		
