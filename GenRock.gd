@@ -4,11 +4,12 @@ extends MeshInstance3D
 # Called when the node enters the scene tree for the first time.
 func generate() -> void:
 	var surface_array = gen_triangle()
-	surface_array = subdivide_triangles(surface_array, 3)
+	surface_array = subdivide_triangles(surface_array,4)
 	surface_array[Mesh.ARRAY_NORMAL] = gen_normals(surface_array)
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
 	mesh.surface_set_material(0, ResourceLoader.load("res://vertex_albedo_material.tres"))
 	ResourceSaver.save(mesh, "res://procedural_objects/icosphere.tres", ResourceSaver.FLAG_COMPRESS)
+	
 
 func gen_triangle() -> Array:
 	var surface_array = []
