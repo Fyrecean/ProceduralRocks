@@ -37,11 +37,71 @@ func gen_icosahedron(radius: float = 1, subdiv: int = 0) -> Mesh:
 	if subdiv > 0:
 		subdivide_sphere(surface_array, radius, subdiv)
 	
-	surface_array[Mesh.ARRAY_NORMAL] = gen_normals(surface_array)
+	surface_array[Mesh.ARRAY_TEX_UV] = gen_sphere_UVs(surface_array, UV_AXIS.UP)
+	surface_array[Mesh.ARRAY_TEX_UV2] = gen_sphere_UVs(surface_array, UV_AXIS.SIDE)
+	surface_array[Mesh.ARRAY_NORMAL] = gen_sphere_normals(surface_array)
 	
+	mesh = ArrayMesh.new()
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
 	mesh.surface_set_material(0, ResourceLoader.load("res://vertex_albedo_material.tres"))
 	return mesh
+	
+var counter = 0
+enum UV_AXIS {
+	UP = 0,
+	SIDE = 1, 
+}
+func gen_sphere_UVs(surface_array: Array, axis: UV_AXIS = UV_AXIS.UP) -> PackedVector2Array:
+	var verts = surface_array[Mesh.ARRAY_VERTEX]
+	var indices = surface_array[Mesh.ARRAY_INDEX]
+	
+	var uvs = PackedVector2Array()
+	# Map vertices to 2D UV coordinates
+	for vert in verts:
+		if axis == UV_AXIS.SIDE:
+			var u = .5 + (atan2(vert.y, vert.x)/(2*PI))
+			var v = .5 - asin(vert.z)/PI
+			uvs.append(Vector2(v,u))
+		else:
+			var u = .5 + (atan2(vert.z, vert.x)/(2*PI))
+			var v = .5 - asin(vert.y)/PI
+			uvs.append(Vector2(u,v))
+	if axis == UV_AXIS.SIDE:
+		return uvs
+	# Duplicate vertices along seam to avoid backwards/stretched UVs
+	var max_u = 0
+	for i in range(0, indices.size(), 3):
+		var a = uvs[indices[i]]
+		var b = uvs[indices[i+1]]
+		var c = uvs[indices[i+2]]
+		var ab = b-a
+		var ac = c-a
+		var cross = Vector3(ab.x, ab.y, 0).cross(Vector3(ac.x, ac.y, 0))
+		if cross.dot(Vector3.BACK) > 0:
+			counter += 1
+			if a.x < .25:
+				verts.append(verts[indices[i]])
+				uvs.append(Vector2(a.x+1, a.y))
+				indices[i] = verts.size() - 1
+				max_u = max(max_u, a.x+1)
+			if b.x < .25:
+				verts.append(verts[indices[i+1]])
+				uvs.append(Vector2(b.x+1, b.y))
+				indices[i+1] = verts.size() - 1
+				max_u = max(max_u, b.x+1)
+			if c.x < .25:
+				verts.append(verts[indices[i+2]])
+				uvs.append(Vector2(c.x+1, c.y))
+				indices[i+2] = verts.size() - 1
+				max_u = max(max_u, c.x+1)
+			
+	max_u -= 1
+	for i in range(uvs.size()):
+		uvs[i].x -= max_u
+
+	print("Backwards: ", counter)
+	print("Total: ", indices.size()/3)
+	return uvs
 
 func calc_average_tri_size(indices, verts) -> Array[float]:
 	var sum = 0
@@ -106,6 +166,12 @@ func vec3_to_color(v: PackedVector3Array) -> PackedColorArray:
 		c[i] = Color(abs(v[i].x), abs(v[i].y), abs(v[i].z), 1)
 	return c
 	
+func gen_sphere_normals(surface_array) -> PackedVector3Array:
+	var normals = PackedVector3Array()
+	for v in surface_array[Mesh.ARRAY_VERTEX]:
+		normals.append(v.normalized())
+	return normals
+
 func gen_normals(surface_array: Array) -> PackedVector3Array:
 	var verts: PackedVector3Array = surface_array[Mesh.ARRAY_VERTEX]
 	var idx: PackedInt32Array = surface_array[Mesh.ARRAY_INDEX]

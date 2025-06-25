@@ -39,8 +39,9 @@ func _on_check_button_toggled(toggled_on: bool) -> void:
 
 var _debug_options = {
 	0: Viewport.DEBUG_DRAW_DISABLED,
-	1: Viewport.DEBUG_DRAW_WIREFRAME,
-	2: Viewport.DEBUG_DRAW_NORMAL_BUFFER,
+	1: Viewport.DEBUG_DRAW_UNSHADED,
+	2: Viewport.DEBUG_DRAW_WIREFRAME,
+	3: Viewport.DEBUG_DRAW_NORMAL_BUFFER,
 }
 
 func _on_item_list_item_selected(index: int) -> void:

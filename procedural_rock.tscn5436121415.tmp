@@ -3,13 +3,14 @@
 [ext_resource type="Script" uid="uid://wjilyxlca6g6" path="res://procedural_rock.gd" id="1_8h7bp"]
 [ext_resource type="Script" uid="uid://cdjj0scpt3nrv" path="res://GenRock.gd" id="1_h1d8h"]
 [ext_resource type="Script" uid="uid://1r7iust1153t" path="res://mesh_debugger.gd" id="2_gc1d4"]
-[ext_resource type="ArrayMesh" uid="uid://b6v602haxah00" path="res://procedural_objects/icosphere.tres" id="2_ph2m1"]
+[ext_resource type="ArrayMesh" uid="uid://b7slqpvv0eepi" path="res://procedural_objects/icosphere.tres" id="2_ph2m1"]
 [ext_resource type="Script" uid="uid://cum6qn3egbocj" path="res://item_list.gd" id="4_sf0s4"]
 
 [node name="ProceduralRock" type="Node"]
 script = ExtResource("1_8h7bp")
 
 [node name="IcoRock" type="MeshInstance3D" parent="."]
+transform = Transform3D(-0.353752, 0, 0.935339, 0, 1, 0, -0.935339, 0, -0.353752, 0, 0, 0)
 mesh = ExtResource("2_ph2m1")
 script = ExtResource("1_h1d8h")
 
