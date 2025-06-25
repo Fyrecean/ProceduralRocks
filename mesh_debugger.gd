@@ -2,20 +2,7 @@ extends Node3D
 
 var has_rendered_text = false
 var meshes: Array[Mesh] = []
-	
-func _unhandled_key_input(event: InputEvent) -> void:
-	if event.is_action_pressed("wireframe"):
-		RenderingServer.set_debug_generate_wireframes(true)
-		var vp = get_viewport()
-		vp.debug_draw = vp.debug_draw ^ vp.DEBUG_DRAW_WIREFRAME
-	if event.is_action_pressed("show_index"):
-		if has_rendered_text:
-			for child in get_children():
-				if child is Label3D:
-					child.visible = !child.visible
-		else:
-			render_text()
-			
+
 func load_mesh(mesh: Mesh) -> void:
 	meshes.append(mesh)
 
@@ -39,3 +26,24 @@ func render_text() -> void:
 			label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 			
 			add_child(label)
+
+
+func _on_check_button_toggled(toggled_on: bool) -> void:
+	if has_rendered_text:
+		for child in get_children():
+			if child is Label3D:
+				child.visible = toggled_on
+	else:
+		render_text()
+
+
+var _debug_options = {
+	0: Viewport.DEBUG_DRAW_DISABLED,
+	1: Viewport.DEBUG_DRAW_WIREFRAME,
+	2: Viewport.DEBUG_DRAW_NORMAL_BUFFER,
+}
+
+func _on_item_list_item_selected(index: int) -> void:
+	RenderingServer.set_debug_generate_wireframes(true)
+	var vp = get_viewport()
+	vp.debug_draw = _debug_options[index]

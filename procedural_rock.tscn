@@ -1,23 +1,53 @@
-[gd_scene load_steps=5 format=3 uid="uid://d1clyp84q0qpc"]
+[gd_scene load_steps=6 format=3 uid="uid://d1clyp84q0qpc"]
 
 [ext_resource type="Script" uid="uid://wjilyxlca6g6" path="res://procedural_rock.gd" id="1_8h7bp"]
 [ext_resource type="Script" uid="uid://cdjj0scpt3nrv" path="res://GenRock.gd" id="1_h1d8h"]
 [ext_resource type="Script" uid="uid://1r7iust1153t" path="res://mesh_debugger.gd" id="2_gc1d4"]
+[ext_resource type="Script" uid="uid://cum6qn3egbocj" path="res://item_list.gd" id="4_sf0s4"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_8h7bp"]
 
-[node name="ProceduralRock" type="Node3D"]
+[node name="ProceduralRock" type="Node"]
 script = ExtResource("1_8h7bp")
 
-[node name="Rock" type="MeshInstance3D" parent="."]
+[node name="IcoRock" type="MeshInstance3D" parent="."]
 mesh = SubResource("ArrayMesh_8h7bp")
 script = ExtResource("1_h1d8h")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.30262)
+current = true
 
 [node name="MeshDebugger" type="Node3D" parent="."]
 script = ExtResource("2_gc1d4")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.94587, -0.324545, 0, 0.324545, 0.94587, 0, 0, 0)
+
+[node name="VFlowContainer" type="VFlowContainer" parent="."]
+offset_left = 4.0
+offset_top = -7.0
+offset_right = 199.0
+offset_bottom = 226.0
+
+[node name="CheckButton" type="CheckButton" parent="VFlowContainer"]
+layout_mode = 2
+text = "Show Mesh Indices"
+
+[node name="Label" type="Label" parent="VFlowContainer"]
+layout_mode = 2
+text = "Display Mode:"
+
+[node name="ItemList" type="ItemList" parent="VFlowContainer"]
+layout_mode = 2
+allow_search = false
+auto_width = true
+auto_height = true
+item_count = 3
+item_0/text = "Default"
+item_1/text = "Wireframe"
+item_2/text = "Normals"
+script = ExtResource("4_sf0s4")
+
+[connection signal="toggled" from="VFlowContainer/CheckButton" to="MeshDebugger" method="_on_check_button_toggled"]
+[connection signal="item_selected" from="VFlowContainer/ItemList" to="MeshDebugger" method="_on_item_list_item_selected"]

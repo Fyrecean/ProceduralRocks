@@ -38,17 +38,6 @@ func gen_icosahedron(radius: float = 1, subdiv: int = 0) -> Mesh:
 		subdivide_sphere(surface_array, radius, subdiv)
 	
 	surface_array[Mesh.ARRAY_NORMAL] = gen_normals(surface_array)
-	var stats = calc_average_tri_size(surface_array[Mesh.ARRAY_INDEX], surface_array[Mesh.ARRAY_VERTEX])
-	print(stats)
-	var big_tris = get_big_tris(surface_array[Mesh.ARRAY_INDEX], surface_array[Mesh.ARRAY_VERTEX], stats[0])
-	print(big_tris)
-	var colors = []
-	colors.resize(surface_array[Mesh.ARRAY_VERTEX].size())
-	colors.fill(Color.WHITE)
-	for i in big_tris:
-		colors[i] = Color.RED
-		
-	surface_array[Mesh.ARRAY_COLOR] = PackedColorArray(colors)
 	
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
 	mesh.surface_set_material(0, ResourceLoader.load("res://vertex_albedo_material.tres"))
@@ -100,7 +89,6 @@ func gen_triangle(subdiv: int = 0) -> Mesh:
 	
 	surface_array[Mesh.ARRAY_VERTEX] = verts
 	surface_array[Mesh.ARRAY_INDEX] = indices
-	print(calc_average_tri_size(surface_array[Mesh.ARRAY_INDEX], surface_array[Mesh.ARRAY_VERTEX]))
 	
 	if (subdiv > 0):
 		subdivide_triangles(surface_array, subdiv)

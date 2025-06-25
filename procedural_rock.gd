@@ -1,7 +1,5 @@
-extends Node3D
+extends Node
 
 func _ready():
-	var ico = $Rock.gen_icosahedron(1, 1)
-	#var tri = $Rock.gen_triangle(4)
+	var ico = $IcoRock.gen_icosahedron(1, 2)
 	$MeshDebugger.load_mesh(ico)
-	$MeshDebugger.render_text()
