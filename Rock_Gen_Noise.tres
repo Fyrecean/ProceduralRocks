@@ -1,0 +1,8 @@
+[gd_resource type="FastNoiseLite" format=3 uid="uid://desg8x2cwc6px"]
+
+[resource]
+frequency = 0.3476
+offset = Vector3(280, 0, 0)
+fractal_octaves = 6
+fractal_lacunarity = 5.0
+fractal_weighted_strength = 1.0

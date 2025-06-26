@@ -5,6 +5,9 @@ var meshes: Array[Mesh] = []
 
 func load_mesh(mesh: Mesh) -> void:
 	meshes.append(mesh)
+	
+func clear_meshes() -> void:
+	meshes = []
 
 func render_text() -> void:
 	has_rendered_text = true

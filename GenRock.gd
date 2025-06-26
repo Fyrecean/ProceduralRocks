@@ -1,6 +1,44 @@
-extends MeshInstance3D
+extends Node
 
-func gen_icosahedron(radius: float = 1, subdiv: int = 0) -> Mesh:
+@export var noise: FastNoiseLite
+
+var _ico_sphere
+
+func array_to_mesh(surface_array: Array) -> Mesh:
+	var mesh = ArrayMesh.new()
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
+	mesh.surface_set_material(0, ResourceLoader.load("res://Rock_Material.tres"))
+	return mesh
+
+func get_rock(resolution: int, scale: Vector3, noise_factor: float):
+	if not _ico_sphere:
+		_ico_sphere = gen_icosahedron(1, resolution)
+	return array_to_mesh(stretch_rock(_ico_sphere, scale, noise_factor))
+
+func stretch_rock(mesh_data: Array, scale: Vector3, noise_factor: float) -> Array:
+	var uvs = mesh_data[Mesh.ARRAY_TEX_UV].duplicate()
+	var uvs2 = mesh_data[Mesh.ARRAY_TEX_UV2].duplicate()
+	var vertices = mesh_data[Mesh.ARRAY_VERTEX].duplicate()
+	var indices = mesh_data[Mesh.ARRAY_INDEX].duplicate()
+	var normals = mesh_data[Mesh.ARRAY_NORMAL].duplicate()
+	
+	var new_mesh = []
+	new_mesh.resize(Mesh.ARRAY_MAX)
+	
+	for i in range(vertices.size()):
+		vertices[i] *= scale
+		vertices[i] += normals[i] * noise_factor * noise.get_noise_3dv(vertices[i])
+	
+	new_mesh[Mesh.ARRAY_TEX_UV] = uvs
+	new_mesh[Mesh.ARRAY_TEX_UV2] = uvs2
+	new_mesh[Mesh.ARRAY_VERTEX] = vertices
+	new_mesh[Mesh.ARRAY_INDEX] = indices
+	new_mesh[Mesh.ARRAY_NORMAL] = normals
+	
+	return new_mesh
+	
+
+func gen_icosahedron(radius: float = 1, subdiv: int = 0) -> Array:
 	var gold = Vector2((1+sqrt(5))/4, .5).normalized() * radius
 	
 	var verts = PackedVector3Array([
@@ -41,12 +79,8 @@ func gen_icosahedron(radius: float = 1, subdiv: int = 0) -> Mesh:
 	surface_array[Mesh.ARRAY_TEX_UV2] = gen_sphere_UVs(surface_array, UV_AXIS.SIDE)
 	surface_array[Mesh.ARRAY_NORMAL] = gen_sphere_normals(surface_array)
 	
-	mesh = ArrayMesh.new()
-	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
-	mesh.surface_set_material(0, ResourceLoader.load("res://vertex_albedo_material.tres"))
-	return mesh
+	return surface_array
 	
-var counter = 0
 enum UV_AXIS {
 	UP = 0,
 	SIDE = 1, 
@@ -78,7 +112,6 @@ func gen_sphere_UVs(surface_array: Array, axis: UV_AXIS = UV_AXIS.UP) -> PackedV
 		var ac = c-a
 		var cross = Vector3(ab.x, ab.y, 0).cross(Vector3(ac.x, ac.y, 0))
 		if cross.dot(Vector3.BACK) > 0:
-			counter += 1
 			if a.x < .25:
 				verts.append(verts[indices[i]])
 				uvs.append(Vector2(a.x+1, a.y))
@@ -98,41 +131,7 @@ func gen_sphere_UVs(surface_array: Array, axis: UV_AXIS = UV_AXIS.UP) -> PackedV
 	max_u -= 1
 	for i in range(uvs.size()):
 		uvs[i].x -= max_u
-
-	print("Backwards: ", counter)
-	print("Total: ", indices.size()/3)
 	return uvs
-
-func calc_average_tri_size(indices, verts) -> Array[float]:
-	var sum = 0
-	var min = 10000
-	var max = -1
-	for i in range(0, indices.size(), 3):
-		var a = indices[i]
-		var b = indices[i+1]
-		var c = indices[i+2]
-		var ab = verts[a] - verts[b]
-		var ac = verts[a] - verts[c]
-		var area = ab.cross(ac).length() / 2
-		sum += area
-		if area < min:
-			min = area
-		if area > max:
-			max = area
-	return [sum / (indices.size() / 3), min, max, max - min]
-	
-func get_big_tris(indices, verts, mean) -> Array[int]:
-	var big_tris: Array[int] = []
-	for i in range(0, indices.size(), 3):
-		var a = indices[i]
-		var b = indices[i+1]
-		var c = indices[i+2]
-		var ab = verts[a] - verts[b]
-		var ac = verts[a] - verts[c]
-		var area = ab.cross(ac).length() / 2
-		if area > mean:
-			big_tris.append_array([a, b, c])
-	return big_tris
 
 func gen_triangle(subdiv: int = 0) -> Mesh:
 	var surface_array = []
@@ -154,9 +153,7 @@ func gen_triangle(subdiv: int = 0) -> Mesh:
 		subdivide_triangles(surface_array, subdiv)
 	
 	surface_array[Mesh.ARRAY_NORMAL] = gen_normals(surface_array)
-	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
-	mesh.surface_set_material(0, ResourceLoader.load("res://vertex_albedo_material.tres"))
-	return mesh
+	return surface_array
 	
 func vec3_to_color(v: PackedVector3Array) -> PackedColorArray:
 	var c = PackedColorArray()

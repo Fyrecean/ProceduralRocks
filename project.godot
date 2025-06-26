@@ -11,12 +11,17 @@ config_version=5
 [application]
 
 config/name="procedural Rocks"
-run/main_scene="uid://d1clyp84q0qpc"
+run/main_scene="uid://by4qdgremf10s"
 config/features=PackedStringArray("4.4", "Forward Plus")
-config/icon="res://icon.svg"
+
+[display]
+
+window/size/viewport_width=608
+window/size/viewport_height=1080
 
 [editor]
 
+movie_writer/movie_file="C:/Users/carter/Videos/Procedural_Rocks/Rock_Editor.avi"
 version_control/plugin_name="GitPlugin"
 version_control/autoload_on_startup=true
 

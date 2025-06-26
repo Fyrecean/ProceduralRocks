@@ -1,0 +1,80 @@
+[gd_scene load_steps=8 format=3 uid="uid://d1clyp84q0qpc"]
+
+[ext_resource type="Script" uid="uid://wjilyxlca6g6" path="res://procedural_rock.gd" id="1_8h7bp"]
+[ext_resource type="Script" uid="uid://cdjj0scpt3nrv" path="res://GenRock.gd" id="1_h1d8h"]
+[ext_resource type="Script" uid="uid://1r7iust1153t" path="res://mesh_debugger.gd" id="2_gc1d4"]
+[ext_resource type="ArrayMesh" uid="uid://rpokkgrsay05" path="res://procedural_objects/icosphere.tres" id="2_ph2m1"]
+[ext_resource type="Script" uid="uid://cum6qn3egbocj" path="res://item_list.gd" id="4_sf0s4"]
+[ext_resource type="Script" uid="uid://ccavxw2svgl11" path="res://save_container.gd" id="5_k16ll"]
+[ext_resource type="PackedScene" uid="uid://bee31arnso1l1" path="res://vector_sliders.tscn" id="7_7rycw"]
+
+[node name="ProceduralRock" type="Node"]
+script = ExtResource("1_8h7bp")
+
+[node name="IcoRock" type="MeshInstance3D" parent="."]
+mesh = ExtResource("2_ph2m1")
+script = ExtResource("1_h1d8h")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.951213, 0.308536, 0, -0.308536, 0.951213, 0, 1.10297, 2.16243)
+current = true
+
+[node name="MeshDebugger" type="Node3D" parent="."]
+script = ExtResource("2_gc1d4")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.94587, -0.324545, 0, 0.324545, 0.94587, 0, 0, 0)
+
+[node name="SaveContainer" type="HFlowContainer" parent="."]
+offset_left = 262.0
+offset_top = 1.0
+offset_right = 812.0
+offset_bottom = 41.0
+script = ExtResource("5_k16ll")
+
+[node name="PathLabel" type="Label" parent="SaveContainer"]
+layout_mode = 2
+text = "Path:"
+
+[node name="PathEntry" type="LineEdit" parent="SaveContainer"]
+layout_mode = 2
+text = "procedural_objects/rock.tres"
+
+[node name="SaveButton" type="Button" parent="SaveContainer"]
+layout_mode = 2
+text = "Save Rock"
+
+[node name="VFlowContainer" type="VFlowContainer" parent="."]
+offset_left = 4.0
+offset_top = -7.0
+offset_right = 206.0
+offset_bottom = 334.0
+
+[node name="ShowMeshIndices" type="CheckButton" parent="VFlowContainer"]
+layout_mode = 2
+text = "Show Mesh Indices"
+
+[node name="DisplayModeLabel" type="Label" parent="VFlowContainer"]
+layout_mode = 2
+text = "Display Mode:"
+
+[node name="DisplayModes" type="ItemList" parent="VFlowContainer"]
+layout_mode = 2
+allow_search = false
+auto_width = true
+auto_height = true
+item_count = 4
+item_0/text = "Default"
+item_1/text = "Unshaded"
+item_2/text = "Wireframe"
+item_3/text = "Normals"
+script = ExtResource("4_sf0s4")
+
+[node name="VectorSliders" parent="VFlowContainer" instance=ExtResource("7_7rycw")]
+layout_mode = 2
+
+[connection signal="save" from="SaveContainer" to="." method="_on_save_container_save"]
+[connection signal="pressed" from="SaveContainer/SaveButton" to="SaveContainer" method="_on_save_button_pressed"]
+[connection signal="toggled" from="VFlowContainer/ShowMeshIndices" to="MeshDebugger" method="_on_check_button_toggled"]
+[connection signal="item_selected" from="VFlowContainer/DisplayModes" to="MeshDebugger" method="_on_item_list_item_selected"]
+[connection signal="changed" from="VFlowContainer/VectorSliders" to="." method="_on_vector_sliders_changed"]

@@ -1,0 +1,58 @@
+[gd_scene load_steps=2 format=3 uid="uid://bee31arnso1l1"]
+
+[ext_resource type="Script" uid="uid://cesdo3v6f4xxy" path="res://vector_sliders.gd" id="1_dgyjd"]
+
+[node name="VectorSliders" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -991.0
+offset_bottom = -556.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_dgyjd")
+
+[node name="X" type="Label" parent="."]
+layout_mode = 2
+text = "X:"
+
+[node name="XSlider" type="HSlider" parent="X"]
+layout_mode = 2
+offset_left = 18.0
+offset_top = 4.0
+offset_right = 146.0
+offset_bottom = 20.0
+min_value = 0.1
+max_value = 2.0
+step = 0.1
+value = 1.0
+
+[node name="Y" type="Label" parent="."]
+layout_mode = 2
+text = "Y:"
+
+[node name="YSlider" type="HSlider" parent="Y"]
+layout_mode = 2
+offset_left = 18.0
+offset_top = 4.0
+offset_right = 146.0
+offset_bottom = 20.0
+min_value = 0.1
+max_value = 2.0
+step = 0.1
+value = 1.0
+
+[node name="Z" type="Label" parent="."]
+layout_mode = 2
+text = "Z:"
+
+[node name="ZSlider" type="HSlider" parent="Z"]
+layout_mode = 2
+offset_left = 18.0
+offset_top = 4.0
+offset_right = 146.0
+offset_bottom = 20.0
+min_value = 0.1
+max_value = 2.0
+step = 0.1
+value = 1.0

@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://dx7ruve08i2v6"]
+
+[ext_resource type="Script" uid="uid://cdjj0scpt3nrv" path="res://GenRock.gd" id="1_dfamm"]
+[ext_resource type="FastNoiseLite" uid="uid://desg8x2cwc6px" path="res://Rock_Gen_Noise.tres" id="2_l3xtn"]
+
+[node name="RockGenerator" type="Node"]
+script = ExtResource("1_dfamm")
+noise = ExtResource("2_l3xtn")
